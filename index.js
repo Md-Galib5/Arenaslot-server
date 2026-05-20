@@ -50,6 +50,17 @@ async function run() {
         res.json(result)
 
     })
+
+     app.patch('/facilities/:id',async (req,res) => {
+        const {id} = req.params
+        const updateData = req.body
+        const result = await facilitiesCollection.updateOne({_id : new ObjectId(id)
+        },
+        {$set:updateData}
+      )
+        res.json(result)
+
+    })
     
 
 
@@ -70,5 +81,3 @@ app.get('/',(req,res) =>{
 app.listen(PORT, () =>{
     console.log(`Server running on PORT ${PORT}`)
 })
-
-//Mongo Pass --  zxFuaDTkiNeRKFCt
