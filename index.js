@@ -29,6 +29,7 @@ async function run() {
 
     const db = client.db("Arenaslot")
     const facilitiesCollection = db.collection("facilities")
+    const bookingCollection = db.collection('bookings')
 
     app.get('/facilities',async (req,res) => {
         const result = await facilitiesCollection.find().toArray()
@@ -49,6 +50,11 @@ async function run() {
         const result = await facilitiesCollection.findOne({_id : new ObjectId(id)})
         res.json(result)
 
+    })
+    app.post('/bookings',async(req,res) => {
+      const bookingdata = req.body
+      const result = await bookingCollection.insertOne(bookingdata)
+       res.json(result)
     })
 
      app.patch('/facilities/:id',async (req,res) => {
