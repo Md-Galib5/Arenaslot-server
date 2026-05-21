@@ -63,6 +63,14 @@ async function run() {
       res.json(result)
     })
 
+     app.delete("/booking/:bookingId", async (req, res) => {
+      const { bookingId } = req.params;
+      const result = await bookingCollection.deleteOne({
+        _id: new ObjectId(bookingId),
+      });
+
+      res.json(result);
+    });
     
 
      app.patch('/facilities/:id',async (req,res) => {
