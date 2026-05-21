@@ -58,52 +58,10 @@ async function run() {
     const facilitiesCollection = db.collection("facilities")
     const bookingCollection = db.collection('bookings')
 
-  app.get("/facilities", async (req, res) => {
-  try {
-    const search = req.query.search?.trim() || "";
-    const type = req.query.type?.trim() || "";
-
-    let query = {};
-
-    if (search) {
-      query.$or = [
-        {
-          facilityName: {
-            $regex: search,
-            $options: "i",
-          },
-        },
-        {
-          facilityType: {
-            $regex: search,
-            $options: "i",
-          },
-        },
-        {
-          location: {
-            $regex: search,
-            $options: "i",
-          },
-        },
-      ];
-    }
-
-    if (type) {
-      query.facilityType = {
-        $regex: type,
-        $options: "i",
-      };
-    }
-
-    const result = await facilitiesCollection.find(query).toArray();
-
-    res.json(result);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Server error" });
-  }
+    app.get("/facilities", async (req, res) => {
+  const result = await facilitiesCollection.find().toArray();
+  res.json(result);
 });
-
     app.post('/facilities',async (req,res) => {
         const facilitiesData = req.body
         console.log(facilitiesData)
@@ -112,7 +70,7 @@ async function run() {
         res.json(result)
     })
 
- app.get('/facilities/:id', verifyToken, async (req, res) => {
+ app.get('/facilities/:id', async (req, res) => {
   const { id } = req.params;
 
   const result = await facilitiesCollection.findOne({
