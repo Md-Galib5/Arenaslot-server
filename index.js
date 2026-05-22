@@ -6,7 +6,7 @@ const express = require('express')
 const dotenv = require('dotenv')
 const cors = require('cors')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const { createRemoteJWKSet, jwtVerify } = require("jose-cjs");
+// const { createRemoteJWKSet, jwtVerify } = require("jose-cjs");
 dotenv.config()
 
 const uri = process.env.MONGODB_URI
@@ -29,26 +29,26 @@ const client = new MongoClient(uri, {
 });
 
 
-const JWKS = createRemoteJWKSet(new URL(`${process.env.CLIENT_URL}/api/auth/jwks`));
+// const JWKS = createRemoteJWKSet(new URL(`${process.env.CLIENT_URL}/api/auth/jwks`));
 
-const verifyToken = async (req, res, next) => {
-  const authHeader = req?.headers.authorization;
-  if (!authHeader) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-  const token = authHeader.split(" ")[1];
-  if (!token) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
+// const verifyToken = async (req, res, next) => {
+//   const authHeader = req?.headers.authorization;
+//   if (!authHeader) {
+//     return res.status(401).json({ message: "Unauthorized" });
+//   }
+//   const token = authHeader.split(" ")[1];
+//   if (!token) {
+//     return res.status(401).json({ message: "Unauthorized" });
+//   }
 
-  try {
-    const { payload } = await jwtVerify(token, JWKS);
-    console.log(payload);
-    next();
-  } catch (error) {
-    return res.status(403).json({ message: "Forbidden" });
-  }
-};
+//   try {
+//     const { payload } = await jwtVerify(token, JWKS);
+//     console.log(payload);
+//     next();
+//   } catch (error) {
+//     return res.status(403).json({ message: "Forbidden" });
+//   }
+// };
 
 async function run() {
   try {
@@ -58,9 +58,49 @@ async function run() {
     const facilitiesCollection = db.collection("facilities")
     const bookingCollection = db.collection('bookings')
 
-    app.get("/facilities", async (req, res) => {
-  const result = await facilitiesCollection.find().toArray();
-  res.json(result);
+//     app.get("/facilities", async (req, res) => {
+//   const result = await facilitiesCollection.find().toArray();
+//   res.json(result);
+// });
+
+
+  // BACKEND API
+// localhost:8080/facilities
+
+app.get("/facilities", async (req, res) => {
+  try {
+    const { search, type } = req.query;
+
+    let query = {};
+
+    // SEARCH BY FACILITY NAME
+    if (search) {
+      query.facilityName = {
+        $regex: search,
+        $options: "i",
+      };
+    }
+
+    // FILTER BY FACILITY TYPE
+    if (type) {
+      query.facilityType = {
+        $regex: `^${type}$`,
+        $options: "i",
+      };
+    }
+
+    const result = await facilitiesCollection
+      .find(query)
+      .toArray();
+
+    res.json(result);
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Failed to fetch facilities",
+    });
+  }
 });
     app.post('/facilities',async (req,res) => {
         const facilitiesData = req.body
