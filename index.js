@@ -73,7 +73,7 @@ app.get("/facilities", async (req, res) => {
 
     let query = {};
 
-    // SEARCH BY FACILITY NAME
+    // SEARCH BY NAME
     if (search) {
       query.facilityName = {
         $regex: search,
@@ -81,20 +81,14 @@ app.get("/facilities", async (req, res) => {
       };
     }
 
-    // FILTER BY FACILITY TYPE
+    // FILTER BY TYPE (FIXED)
     if (type) {
-      query.facilityType = {
-        $regex: `^${type}$`,
-        $options: "i",
-      };
+      query.facilityType = type;
     }
 
-    const result = await facilitiesCollection
-      .find(query)
-      .toArray();
+    const result = await facilitiesCollection.find(query).toArray();
 
     res.json(result);
-
   } catch (error) {
     console.log(error);
     res.status(500).json({
